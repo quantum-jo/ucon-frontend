@@ -1,4 +1,8 @@
+if(localStorage.getItem("jwtToken"))
+  window.location.replace("./dashboard.html");    // replace() removes the current URL from history stack instead of keeping the current URL in history stack, so the user cannot go back to the previous URL
+
 $(document).ready(function() {
+
   $("#loginForm").submit(function(event) {
     event.preventDefault();
     var username = $("#login-username").val();
@@ -14,7 +18,8 @@ $(document).ready(function() {
       success: (result) => {
         if(result.isValid) {
           localStorage.setItem("jwtToken", result.jwtToken);
-          window.location.href = "./dashboard.html";
+          window.location.replace("./dashboard.html");
+
         } else {
           $("#loginMessage").html(result.message);
         }
@@ -39,7 +44,7 @@ $(document).ready(function() {
     };
     $.ajax({
       method: "POST",
-      url: "http://localhost:3000/register", 
+      url: "http://localhost:3000/register",
       data: formData,
       success: (result) => {
         $("#registerMessage").html(result.message);
