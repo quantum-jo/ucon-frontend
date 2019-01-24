@@ -9,7 +9,7 @@ function postTemplate(post) {
       <div class="card-body">
         ${
           post.image
-            ? `<img class="img-fluid" src="${"http://localhost:3000" +
+            ? `<img class="img-fluid" src="${"https://spider.nitt.edu/workshop/" +
                 post.image}" alt="post image" style="width:100%">`
             : ""
         }
@@ -58,7 +58,7 @@ function profileTemplate(profile) {
         <div class="row">
           <div class="col-auto">
             ${profile.profile_pic
-              ? `<img id="profile-pic" src="${"http://localhost:3000" + profile.profile_pic}" class="card-img-left" alt="profile picture">`
+              ? `<img id="profile-pic" src="${"https://spider.nitt.edu/workshop" + profile.profile_pic}" class="card-img-left" alt="profile picture">`
               : ""
             }
           </div>
@@ -91,7 +91,7 @@ function searchUser(event) {
   let username = $("#search-username").val();
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/user/profile/" + username,
+    url: "https://spider.nitt.edu/workshop/user/profile/" + username,
     // crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -112,7 +112,7 @@ function searchUser(event) {
 function renderPosts(username) {
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/post/" + username,
+    url: "https://spider.nitt.edu/workshop/post/" + username,
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -132,7 +132,7 @@ function renderPosts(username) {
 function renderProfile(username) {
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/user/profile/" + username,
+    url: "https://spider.nitt.edu/workshop/user/profile/" + username,
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -149,7 +149,7 @@ function toggleLike(post_id, btn) {
   button.attr("disabled", true);
   $.ajax({
     method: "POST",
-    url: "http://localhost:3000/post/like",
+    url: "https://spider.nitt.edu/workshop/post/like",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -177,7 +177,7 @@ function toggleLike(post_id, btn) {
 function sendFriendRequest() {
   $.ajax({
     method: "POST",
-    url: "http://localhost:3000/friendrequests",
+    url: "https://spider.nitt.edu/workshop/friendrequests",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
@@ -197,7 +197,7 @@ function sendFriendRequest() {
 function acceptFriendRequest() {
   $.ajax({
     method: "PUT",
-    url: "http://localhost:3000/friendrequests",
+    url: "https://spider.nitt.edu/workshop/friendrequests",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },

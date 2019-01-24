@@ -11,7 +11,7 @@ function parseJwt () {
 function acceptFriend(button, from) {
   $.ajax({
     method: "PUT",
-    url: "http://localhost:3000/friendrequests",
+    url: "https://spider.nitt.edu/workshop/friendrequests",
     crossDomain: true,
     data: `from=${from}`,
     headers: {
@@ -34,7 +34,7 @@ function acceptFriend(button, from) {
 function rejectFriend(button, from) {
   $.ajax({
     method: "DELETE",
-    url: "http://localhost:3000/friendrequests",
+    url: "https://spider.nitt.edu/workshop/friendrequests",
     crossDomain: true,
     data: `from=${from}`,
     headers: {
@@ -56,7 +56,7 @@ function rejectFriend(button, from) {
 function renderFriendRequests() {
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/friendrequests",
+    url: "https://spider.nitt.edu/workshop/friendrequests",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -78,7 +78,7 @@ function renderFriendRequests() {
 function renderFriends() {
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/user/friends",
+    url: "https://spider.nitt.edu/workshop/user/friends",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -100,7 +100,7 @@ function toggleLike(post_id, btn) {
   button.attr("disabled", true);
   $.ajax({
     method: "POST",
-    url: "http://localhost:3000/post/like",
+    url: "https://spider.nitt.edu/workshop/post/like",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -130,7 +130,7 @@ function postTemplate(post) {
     `<div class="card col-sm-11 col-md-8 m-auto">
       <div class="card-body">
         ${post.image
-          ? `<img class="img-fluid" src="${"http://localhost:3000" + post.image}" alt="post image" style="width:100%">`
+          ? `<img class="img-fluid" src="${"https://spider.nitt.edu/workshop" + post.image}" alt="post image" style="width:100%">`
           : ""
         }
         <h4 class="card-title">${post.post_by}</h4>
@@ -169,7 +169,7 @@ function friendsTemplate(friendRequest) {
 function renderPosts() {
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/post",
+    url: "https://spider.nitt.edu/workshop/post",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -199,7 +199,7 @@ function createPost(e) {
   formData.append("description", desc);
   $.ajax({
     method: "POST",
-    url: "http://localhost:3000/post",
+    url: "https://spider.nitt.edu/workshop/post",
     enctype: 'multipart/form-data',
     crossDomain: true,
     headers: {
