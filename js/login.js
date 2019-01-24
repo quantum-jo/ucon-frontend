@@ -13,7 +13,7 @@ $(document).ready(function() {
     };
     $.ajax({
       method: "POST",
-      url: "http://localhost:3000/login",
+      url: "http://643eb335.ngrok.io/login",
       data: formData,
       success: (result) => {
         if(result.isValid) {
@@ -21,36 +21,41 @@ $(document).ready(function() {
           window.location.replace("./dashboard.html");
 
         } else {
-          $("#loginMessage").html(result.message);
+          $("#loginMessage").text(result.message);
         }
       },
       error: (error) => {
-        $("#loginMessage").html(error.responseJSON.message);
+        $("#loginMessage").text(error.responseJSON.message);
       }
     });
   });
 
   $("#registerForm").submit(function(event) {
     event.preventDefault();
-    var username = $("#register-username").val();
-    var password = $("#register-password").val();
-    var name = $("#register-name").val();
-    var bio = $("#register-bio").val();
-    var formData = {
-      username: username,
-      password: password,
-      name: name,
-      bio: bio,
-    };
+    let username = $("#register-username").val();
+    let password = $("#register-password").val();
+    let name = $("#register-name").val();
+    let bio = $("#register-bio").val();
+    let profile_pic = $("#register-profile-pic")[0].files[0];
+    let formData = new FormData();
+    formData.append("username", username);
+    formData.append("password", password);
+    formData.append("name", name);
+    formData.append("bio", bio);
+    formData.append("profile_pic", profile_pic);
     $.ajax({
       method: "POST",
-      url: "http://localhost:3000/register",
+      url: "http://643eb335.ngrok.io/register",
+      enctype: 'multipart/form-data',
       data: formData,
+      cache: false,
+      processData: false,
+      contentType: false,
       success: (result) => {
-        $("#registerMessage").html(result.message);
+        $("#registerMessage").text(result.message);
       },
       error: (error) => {
-        $("#registerMessage").html(error.responseJSON.message);
+        $("#registerMessage").text(error.responseJSON.message);
       }
     });
   });

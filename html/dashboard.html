@@ -21,16 +21,16 @@
     <!-- Links -->
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="#">Profile</a>
+        <a class="nav-link" href="./profile.html">Profile</a>
       </li>
 
       <!-- search bar -->
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <form class="form-inline">
           <input class="form-control mr-sm-2" type="text" placeholder="Search">
           <button class="btn btn-success" type="submit">Search</button>
         </form>
-      </li>
+      </li> -->
     </ul>
 
     <ul class="navbar-nav">
@@ -45,7 +45,7 @@
   <div class="container-fluid">
       <div class="row">
           <!-- feed part -->
-          <div class="col-sm-8" id="feed">
+          <div class="col-sm-8">
             <div class="card col-sm-11 col-md-8 m-auto p-5">
               <form id="form-post" enctype="multipart/form-data">
                 <div class="form-item">
@@ -56,18 +56,19 @@
                 </div>
               </form>
             </div>
+            <div id="feed"></div>
           </div>
           <!-- friend request part -->
           <div class="col-sm-4 sticky-top align-self-start">
             <div id="friends-wrapper" class="container">
-              <h2>Friend Requests</h2>
+              <h4>Friend Requests</h4>
               <table class="table table-hover table-borderless">
                 <tbody id="friendRequests">
                 </tbody>
               </table>
             </div>
             <div id="friends-list-wrapper" class="container">
-                <h2>Friends</h2>
+                <h4>Friends</h4>
                 <table class="table table-hover">
                   <tbody id="friendsList">
                   </tbody>

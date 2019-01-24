@@ -18,32 +18,39 @@
     <!-- Brand -->
     <a class="navbar-brand" href="#">Spider Workshop</a>
   </nav>
-  
-  <div class="row mt-5">
-    <div class="card col-md-4 offset-md-1">
-      <br>
-      <br>
-      <h2>Login</h2>
-      <form id="loginForm">
-        <input type="text" placeholder="Username" name="username" class="form-control" id="login-username" required="true"><br>
-        <input type="password" placeholder="Password" name="password" class="form-control" id="login-password" required="true"><br>
-        <button type="submit" class="btn btn-success ">Login</button>
-        <p id="loginMessage" class="text-danger"></p>
-      </form>
-    </div>
-    <div class="card col-md-4 offset-md-2">
-      <br>
-      <br>
-      <h2>Register</h2>
-      <form id="registerForm">
-        <input type="text" placeholder="Username" name="username" class="form-control" id="register-username" required="true"><br>
-        <input type="password" placeholder="Password" name="password" class="form-control" id="register-password" required="true"><br>
-        <input type="text" placeholder="Name" name="name" class="form-control" id="register-name" required="true"><br>
-        <input type="text" placeholder="Bio" name="bio" class="form-control" id="register-bio" required="true"><br>
-        <button type="submit" class="btn btn-success ">Register</button>
-        <p id="registerMessage" class="text-danger"></p>
-      </form>
-    </div>
+
+  <div class="container-fluid">
+    <div class="row mt-5">
+        <div class="card col-md-4 offset-md-1">
+          <br>
+          <br>
+          <h2>Login</h2>
+          <form id="loginForm">
+            <input type="text" placeholder="Username" name="username" class="form-control" id="login-username" required="true" value="vaibhav"><br>
+            <input type="password" placeholder="Password" name="password" class="form-control" id="login-password" required="true" value="vaibhav"><br>
+            <button type="submit" class="btn btn-success ">Login</button>
+            <p id="loginMessage" class="text-danger"></p>
+          </form>
+        </div>
+        <div class="card col-md-4 offset-md-2">
+          <br>
+          <br>
+          <h2>Register</h2>
+          <form id="registerForm">
+            <input type="text" placeholder="Username" name="username" class="form-control" id="register-username" required="true"><br>
+            <input type="password" placeholder="Password" name="password" class="form-control" id="register-password" required="true"><br>
+            <input type="text" placeholder="Name" name="name" class="form-control" id="register-name" required="true"><br>
+            <input type="text" placeholder="Bio" name="bio" class="form-control" id="register-bio" required="true"><br>
+            <input id="register-profile-pic" type="file" class="form-control-file" name="profile_pic">
+            <!-- <div class="custom-file">
+              <input type="file" class="custom-file-input" id="register-profile-pic">
+              <label class="custom-file-label" for="register-profile-pic">Choose file</label>
+            </div> -->
+            <button type="submit" class="btn btn-success mt-3">Register</button>
+            <p id="registerMessage" class="text-danger"></p>
+          </form>
+        </div>
+      </div>
   </div>
 
 </body>

@@ -1,10 +1,17 @@
 if (!localStorage.getItem("jwtToken"))
   window.location.replace("./login.html");
 
+function parseJwt () {
+    let token = localStorage.getItem("jwtToken");
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace('-', '+').replace('_', '/');
+    return JSON.parse(window.atob(base64));
+};
+
 function acceptFriend(button, from) {
   $.ajax({
     method: "PUT",
-    url: "http://localhost:3000/friendrequests",
+    url: "http://643eb335.ngrok.io/friendrequests",
     crossDomain: true,
     data: `from=${from}`,
     headers: {
@@ -16,6 +23,7 @@ function acceptFriend(button, from) {
     success: result => {
       console.log("accepted", {result})
       renderFriendRequests();
+      renderFriends();
     },
     error: err => {
       console.log({err})
@@ -26,7 +34,7 @@ function acceptFriend(button, from) {
 function rejectFriend(button, from) {
   $.ajax({
     method: "DELETE",
-    url: "http://localhost:3000/friendrequests",
+    url: "http://643eb335.ngrok.io/friendrequests",
     crossDomain: true,
     data: `from=${from}`,
     headers: {
@@ -48,7 +56,7 @@ function rejectFriend(button, from) {
 function renderFriendRequests() {
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/friendrequests",
+    url: "http://643eb335.ngrok.io/friendrequests",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -70,7 +78,7 @@ function renderFriendRequests() {
 function renderFriends() {
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/user/friends",
+    url: "http://643eb335.ngrok.io/user/friends",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -83,9 +91,37 @@ function renderFriends() {
       });
       $("#friendsList").html(`<ul class="list-group">` + friendsListHTML + `</ul>`);
     },
-    error: err => {
-      console.log({ err });
-    }
+    error: console.log
+  });
+}
+
+function toggleLike(post_id, btn) {
+  let button = $(btn);
+  button.attr("disabled", true);
+  $.ajax({
+    method: "POST",
+    url: "http://643eb335.ngrok.io/post/like",
+    crossDomain: true,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+    },
+    data: {post_id: post_id},
+    success: result => {
+      console.log("like res", result);
+      let likes = Number(button.find("span").text());
+      if (result.message === "Post unliked") {
+        likes = likes - 1;
+        button.find("span").text(likes);
+        button.removeClass("btn-primary").addClass("btn-light");
+        button.attr("disabled", false);
+      } else {
+        likes = likes + 1;
+        button.find("span").text(likes);
+        button.removeClass("btn-light").addClass("btn-primary");
+        button.attr("disabled", false);
+      }
+    },
+    error: console.log
   });
 }
 
@@ -94,14 +130,23 @@ function postTemplate(post) {
     `<div class="card col-sm-11 col-md-8 m-auto">
       <div class="card-body">
         ${post.image
-          ? `<img class="img-fluid" src="${"http://localhost:3000" + post.image}" alt="post image" style="width:100%">`
+          ? `<img class="img-fluid" src="${"http://643eb335.ngrok.io" + post.image}" alt="post image" style="width:100%">`
           : ""
         }
         <h4 class="card-title">${post.post_by}</h4>
         <p class="card-text">
           ${post.description}
         </p>
-        <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+        ${post.likes.filter((like) => like.liked_by === parseJwt().username).length > 0
+          ? `<button class="btn btn-primary btn-sm" onclick="toggleLike(${post.id}, this)">
+              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+              <span>${post.likes.length}</span>
+            </button>`
+          : `<button class="btn btn-light btn-sm" onclick="toggleLike(${post.id}, this)">
+              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+              <span>${post.likes.length}</span>
+            </button>`
+        }
       </div>
     </div>`
   );
@@ -124,7 +169,7 @@ function friendsTemplate(friendRequest) {
 function renderPosts() {
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/post/all",
+    url: "http://643eb335.ngrok.io/post/all",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -132,14 +177,12 @@ function renderPosts() {
     success: result => {
       console.log(result);
       let postsHTML = "";
-      result.forEach(post => {
+      result.message.forEach(post => {
         postsHTML += postTemplate(post)
       });
-      $("#feed").append(postsHTML);
+      $("#feed").html(postsHTML);
     },
-    error: err => {
-      console.log({ err });
-    }
+    error: console.log
   });
 }
 
@@ -148,15 +191,15 @@ function createPost(e) {
   console.log(e)
   let imageFile = $("#post-image")[0].files[0];
   let desc = $("#post-desc").val();
-  $("#post-image").prop("disabled", true);
-  $("#post-desc").prop("disabled", true);
-  $("#post-submit").prop("disabled", true);
+  $("#post-image").attr("disabled", true);
+  $("#post-desc").attr("disabled", true);
+  $("#post-submit").attr("disabled", true);
   let formData = new FormData();
   formData.append("image", imageFile);
   formData.append("description", desc);
   $.ajax({
     method: "POST",
-    url: "http://localhost:3000/post",
+    url: "http://643eb335.ngrok.io/post",
     enctype: 'multipart/form-data',
     crossDomain: true,
     headers: {
@@ -170,9 +213,10 @@ function createPost(e) {
       console.log({response})
       $("#post-image").val("");
       $("#post-desc").val("");
-      $("#post-image").prop("disabled", false);
-      $("#post-desc").prop("disabled", false);
-      $("#post-submit").prop("disabled", false);
+      $("#post-image").attr("disabled", false);
+      $("#post-desc").attr("disabled", false);
+      $("#post-submit").attr("disabled", false);
+      renderPosts();
     },
     error: err => console.log({err})
   });
