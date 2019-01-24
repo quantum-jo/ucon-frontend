@@ -169,7 +169,7 @@ function friendsTemplate(friendRequest) {
 function renderPosts() {
   $.ajax({
     method: "GET",
-    url: "http://localhost:3000/post/all",
+    url: "http://localhost:3000/post",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
