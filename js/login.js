@@ -13,7 +13,7 @@ $(document).ready(function() {
     };
     $.ajax({
       method: "POST",
-      url: "http://643eb335.ngrok.io/login",
+      url: "http://localhost:3000/login",
       data: formData,
       success: (result) => {
         if(result.isValid) {
@@ -45,7 +45,7 @@ $(document).ready(function() {
     formData.append("profile_pic", profile_pic);
     $.ajax({
       method: "POST",
-      url: "http://643eb335.ngrok.io/register",
+      url: "http://localhost:3000/register",
       enctype: 'multipart/form-data',
       data: formData,
       cache: false,

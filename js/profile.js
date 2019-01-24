@@ -1,13 +1,15 @@
 if (!localStorage.getItem("jwtToken"))
   window.location.replace("./login.html");
 
+var currentProfileUsername;
+
 function postTemplate(post) {
   return `
     <div class="card col-sm-11 col-md-11 m-auto">
       <div class="card-body">
         ${
           post.image
-            ? `<img class="img-fluid" src="${"http://643eb335.ngrok.io" +
+            ? `<img class="img-fluid" src="${"http://localhost:3000" +
                 post.image}" alt="post image" style="width:100%">`
             : ""
         }
@@ -56,7 +58,7 @@ function profileTemplate(profile) {
         <div class="row">
           <div class="col-auto">
             ${profile.profile_pic
-              ? `<img id="profile-pic" src="${"http://643eb335.ngrok.io" + profile.profile_pic}" class="card-img-left" alt="profile picture">`
+              ? `<img id="profile-pic" src="${"http://localhost:3000" + profile.profile_pic}" class="card-img-left" alt="profile picture">`
               : ""
             }
           </div>
@@ -89,16 +91,17 @@ function searchUser(event) {
   let username = $("#search-username").val();
   $.ajax({
     method: "GET",
-    url: "http://643eb335.ngrok.io/user/profile/" + username,
+    url: "http://localhost:3000/user/profile/" + username,
     // crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
     success: result => {
+      currentProfileUsername = username;
       $("#feed").html("");
       $("#profile").html("");
-      renderProfile(username);
-      renderPosts(username);
+      renderProfile(currentProfileUsername);
+      renderPosts(currentProfileUsername);
     },
     error: function(err) {
       alert(err.responseJSON.message);
@@ -109,7 +112,7 @@ function searchUser(event) {
 function renderPosts(username) {
   $.ajax({
     method: "GET",
-    url: "http://643eb335.ngrok.io/post/" + username,
+    url: "http://localhost:3000/post/" + username,
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -129,7 +132,7 @@ function renderPosts(username) {
 function renderProfile(username) {
   $.ajax({
     method: "GET",
-    url: "http://643eb335.ngrok.io/user/profile/" + username,
+    url: "http://localhost:3000/user/profile/" + username,
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -146,7 +149,7 @@ function toggleLike(post_id, btn) {
   button.attr("disabled", true);
   $.ajax({
     method: "POST",
-    url: "http://643eb335.ngrok.io/post/like",
+    url: "http://localhost:3000/post/like",
     crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
@@ -171,13 +174,50 @@ function toggleLike(post_id, btn) {
   });
 }
 
-function sendFriendRequest() {};
-function acceptFriendRequest() {};
+function sendFriendRequest() {
+  $.ajax({
+    method: "POST",
+    url: "http://localhost:3000/friendrequests",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+    },
+    data: {
+      to: currentProfileUsername,
+    },
+    success: result => {
+      $("#feed").html("");
+      $("#profile").html("");
+      renderProfile(currentProfileUsername);
+      renderPosts(currentProfileUsername);
+    },
+    error: console.log
+  });
+};
+
+function acceptFriendRequest() {
+  $.ajax({
+    method: "PUT",
+    url: "http://localhost:3000/friendrequests",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
+    },
+    data: {
+      from: currentProfileUsername,
+    },
+    success: result => {
+      $("#feed").html("");
+      $("#profile").html("");
+      renderProfile(currentProfileUsername);
+      renderPosts(currentProfileUsername);
+    },
+    error: console.log
+  });
+};
 
 $(document).ready(function() {
-  let username = parseJwt().username;
-  renderProfile(username);
-  renderPosts(username);
+  currentProfileUsername = parseJwt().username;
+  renderProfile(currentProfileUsername);
+  renderPosts(currentProfileUsername);
   $("#btn-logout").click(logout);
   $("#form-search-user").submit(searchUser);
 });
