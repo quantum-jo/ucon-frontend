@@ -12,7 +12,7 @@ $(document).ready(function() {
     };
     $.ajax({
       method: "POST",
-      url: "http://localhost:3000/login",
+      url: "https://spider.nitt.edu/workshop/login",
       data: formData,
       success: function(result) {
         localStorage.setItem("jwtToken", result.jwtToken);
@@ -41,8 +41,8 @@ $(document).ready(function() {
     formData.append("profile_pic", profile_pic);
     $.ajax({
       method: "POST",
-      url: "http://localhost:3000/register",
-      enctype: "multipart/form-data",
+      url: "https://spider.nitt.edu/workshop/register",
+      enctype: 'multipart/form-data',
       data: formData,
       cache: false,
       processData: false,
