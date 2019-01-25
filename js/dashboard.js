@@ -1,32 +1,34 @@
-if (!localStorage.getItem("jwtToken"))
-  window.location.replace("./login.html");
+if (!localStorage.getItem("jwtToken")) window.location.replace("./login.html");
 
-function parseJwt () {
-    let token = localStorage.getItem("jwtToken");
-    let base64Url = token.split('.')[1];
-    let base64 = base64Url.replace('-', '+').replace('_', '/');
-    return JSON.parse(window.atob(base64));
-};
+function parseJwt() {
+  let token = localStorage.getItem("jwtToken");
+  let base64Url = token.split(".")[1];
+  let base64 = base64Url.replace("-", "+").replace("_", "/");
+  return JSON.parse(window.atob(base64));
+}
 
 function acceptFriend(button, from) {
   $.ajax({
     method: "PUT",
     url: "http://localhost:3000/friendrequests",
-    crossDomain: true,
-    data: `from=${from}`,
+    data: { from: from },
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
-    beforeSend: () => {
+    beforeSend: function() {
       button.disabled = true;
     },
-    success: result => {
-      console.log("accepted", {result})
+    success: function(result) {
+      console.log("accepted", result);
+      // Rerendering the friend requests as the current request has to be removed
       renderFriendRequests();
+      // Friends list should be updated with the new friend
       renderFriends();
+      // Posts feed should be updated with the new friend's post
+      renderPosts();
     },
-    error: err => {
-      console.log({err})
+    error: function(err) {
+      console.log(err);
     }
   });
 }
@@ -36,19 +38,20 @@ function rejectFriend(button, from) {
     method: "DELETE",
     url: "http://localhost:3000/friendrequests",
     crossDomain: true,
-    data: `from=${from}`,
+    data: { from: from },
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
-    beforeSend: () => {
+    beforeSend: function() {
       button.disabled = true;
     },
-    success: result => {
-      console.log("rejected", {result})
+    success: function(result) {
+      console.log("rejected", { result });
+      // Rerender friendrequests for removing the current request. No need to rerender posts or friends as that is not going to be affected.
       renderFriendRequests();
     },
-    error: err => {
-      console.log({err})
+    error: function(err) {
+      console.log(err);
     }
   });
 }
@@ -57,20 +60,21 @@ function renderFriendRequests() {
   $.ajax({
     method: "GET",
     url: "http://localhost:3000/friendrequests",
-    crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
-    success: result => {
+    success: function(result) {
       let friendsHTML = "";
-      console.log({result});
-      result.friendrequests.forEach(friendRequest => {
-        friendsHTML += friendsTemplate(friendRequest)
+      console.log({ result });
+      result.friendrequests.forEach(function(friendRequest) {
+        friendsHTML += friendsTemplate(friendRequest);
       });
-      $("#friendRequests").html(`<ul class="list-group">` + friendsHTML + `</ul>`);
+      $("#friendRequests").html(
+        `<ul class="list-group">` + friendsHTML + `</ul>`
+      );
     },
-    error: err => {
-      console.log({ err });
+    error: function(err) {
+      console.log(err);
     }
   });
 }
@@ -79,35 +83,40 @@ function renderFriends() {
   $.ajax({
     method: "GET",
     url: "http://localhost:3000/user/friends",
-    crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
-    success: result => {
+    success: function(result) {
       let friendsListHTML = "";
-      console.log("friendsList", {result});
+      console.log("friendsList", { result });
       result.message.forEach(friend => {
-        friendsListHTML += `<li class="list-group-item">${friend}</li>`
+        friendsListHTML += `<li class="list-group-item">${friend}</li>`;
       });
-      $("#friendsList").html(`<ul class="list-group">` + friendsListHTML + `</ul>`);
+      $("#friendsList").html(
+        `<ul class="list-group">` + friendsListHTML + `</ul>`
+      );
     },
-    error: console.log
+    error: function(err) {
+      console.log(err);
+    }
   });
 }
 
 function toggleLike(post_id, btn) {
+  // This line helps to convert DOM into JQuery object which allows extra functionalities which are shown below
   let button = $(btn);
   button.attr("disabled", true);
   $.ajax({
     method: "POST",
     url: "http://localhost:3000/post/like",
-    crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
-    data: {post_id: post_id},
-    success: result => {
+    data: { post_id: post_id },
+    success: function(result) {
       console.log("like res", result);
+      // Finds the contents span tag inside the button tag which called the function
+      // The contents will be in form of string. So, we convert it into int by Number()
       let likes = Number(button.find("span").text());
       if (result.message === "Post unliked") {
         likes = likes - 1;
@@ -121,13 +130,14 @@ function toggleLike(post_id, btn) {
         button.attr("disabled", false);
       }
     },
-    error: console.log
+    error: function(error) {
+      console.log(error);
+    }
   });
 }
 
 function postTemplate(post) {
-  return (
-    `<div class="card col-sm-11 col-md-8 m-auto">
+  return `<div class="card col-sm-11 col-md-8 m-auto">
       <div class="card-body">
         ${post.image
           ? `<img class="img-fluid" src="${"http://localhost:3000" + post.image}" alt="post image" style="width:100%">`
@@ -137,24 +147,23 @@ function postTemplate(post) {
         <p class="card-text">
           ${post.description}
         </p>
-        ${post.likes.filter((like) => like.liked_by === parseJwt().username).length > 0
-          ? `<button class="btn btn-primary btn-sm" onclick="toggleLike(${post.id}, this)">
-              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-              <span>${post.likes.length}</span>
-            </button>`
-          : `<button class="btn btn-light btn-sm" onclick="toggleLike(${post.id}, this)">
-              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-              <span>${post.likes.length}</span>
-            </button>`
+        ${
+          post.likes.filter(like => like.liked_by === parseJwt().username).length > 0
+            ? `<button class="btn btn-primary btn-sm" onclick="toggleLike(${post.id}, this)">
+                <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                <span>${post.likes.length}</span>
+               </button>`
+            : `<button class="btn btn-light btn-sm" onclick="toggleLike(${post.id}, this)">
+                <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                <span>${post.likes.length}</span>
+               </button>`
         }
       </div>
-    </div>`
-  );
+    </div>`;
 }
 
 function friendsTemplate(friendRequest) {
-  return(
-    `<tr>
+  return `<tr>
       <td>${friendRequest.from}</td>
       <td>
         <ul class="list-inline">
@@ -162,33 +171,32 @@ function friendsTemplate(friendRequest) {
         <li class="list-inline-item"><button class="btn btn-danger" onclick="rejectFriend(this, '${friendRequest.from}')">Reject</button></li>
         </ul>
       </td>
-    </tr>`
-  );
+    </tr>`;
 }
 
 function renderPosts() {
   $.ajax({
     method: "GET",
     url: "http://localhost:3000/post",
-    crossDomain: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
-    success: result => {
+    success: function(result) {
       console.log(result);
       let postsHTML = "";
       result.message.forEach(post => {
-        postsHTML += postTemplate(post)
+        postsHTML += postTemplate(post);
       });
       $("#feed").html(postsHTML);
     },
-    error: console.log
+    error: function(error) {
+      console.log(error);
+    }
   });
 }
 
-function createPost(e) {
-  e.preventDefault();
-  console.log(e)
+function createPost(event) {
+  event.preventDefault();
   let imageFile = $("#post-image")[0].files[0];
   let desc = $("#post-desc").val();
   $("#post-image").attr("disabled", true);
@@ -200,8 +208,7 @@ function createPost(e) {
   $.ajax({
     method: "POST",
     url: "http://localhost:3000/post",
-    enctype: 'multipart/form-data',
-    crossDomain: true,
+    enctype: "multipart/form-data",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
@@ -209,8 +216,8 @@ function createPost(e) {
     cache: false,
     processData: false,
     contentType: false,
-    success: response => {
-      console.log({response})
+    success: function(response) {
+      console.log({ response });
       $("#post-image").val("");
       $("#post-desc").val("");
       $("#post-image").attr("disabled", false);
@@ -218,7 +225,9 @@ function createPost(e) {
       $("#post-submit").attr("disabled", false);
       renderPosts();
     },
-    error: err => console.log({err})
+    error: function(err) {
+      console.log(err);
+    }
   });
 }
 
@@ -231,6 +240,8 @@ $(document).ready(function() {
   renderPosts();
   renderFriendRequests();
   renderFriends();
+
+  // Define event handlers
   $("#btn-logout").click(logout);
   $("#form-post").submit(createPost);
 });

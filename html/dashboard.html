@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
   <title>Social Media App</title>
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="shortcut icon" type="image/png" href="../favicon.png"/>
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
   <script src="../js/dashboard.js"></script>
 </head>
+
 <body>
-  <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <nav class="navbar bg-dark navbar-dark">
     <!-- Brand -->
     <a class="navbar-brand" href="#">Spider Workshop</a>
 
@@ -33,41 +38,48 @@
 
   </nav>
 
-<!-- News Feed -->
-  <div class="container-fluid">
-      <div class="row">
-          <!-- feed part -->
-          <div class="col-sm-8">
-            <div class="card col-sm-11 col-md-8 m-auto p-5">
-              <form id="form-post" enctype="multipart/form-data">
-                <div class="form-item">
-                  <label for="desc">What's on your mind?</label>
-                  <textarea id="post-desc" rows="3" type="text" class="form-control mr-sm-2" placeholder="Write text here" autocomplete="off" ></textarea>
-                  <input id="post-image" type="file" class="form-control-file" name="postImage">
-                  <button id="post-submit" class="btn btn-success" type="submit">Post</button>
-                </div>
-              </form>
-            </div>
-            <div id="feed"></div>
+  <!-- News Feed -->
+  <div class="container-fluid row">
+
+    <!-- post feed part -->
+    <div class="col-sm-8">
+      <div class="card col-sm-11 col-md-8 m-auto p-5">
+        <form id="form-post" enctype="multipart/form-data">
+          <div class="form-item">
+            <label for="post-desc">What's on your mind?</label>
+            <textarea id="post-desc" rows="3" type="text" class="form-control" placeholder="Write post here" autocomplete="off" ></textarea>
+            <label for="post-image">Post Image:</label>
+            <input id="post-image" type="file" class="form-control-file">
+            <button id="post-submit" class="btn btn-success" type="submit">Post</button>
           </div>
-          <!-- friend request part -->
-          <div class="col-sm-4 sticky-top align-self-start">
-            <div id="friends-wrapper" class="container">
-              <h4>Friend Requests</h4>
-              <table class="table table-hover table-borderless">
-                <tbody id="friendRequests">
-                </tbody>
-              </table>
-            </div>
-            <div id="friends-list-wrapper" class="container">
-                <h4>Friends</h4>
-                <table class="table table-hover">
-                  <tbody id="friendsList">
-                  </tbody>
-                </table>
-              </div>
-          </div>
-        </div>
+        </form>
+      </div>
+
+      <!-- We will be fetching feeds from the API and filling the div from the javascript -->
+      <div id="feed"></div>
+    </div>
+
+    <!-- friend request part -->
+    <div class="col-sm-4 sticky-top align-self-start">
+
+      <h4>Friend Requests</h4>
+      <div id="friends-wrapper" class="container">
+        <table class="table table-hover table-borderless">
+          <tbody id="friendRequests">
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Friends</h4>
+      <div id="friends-list-wrapper" class="container">
+        <table class="table table-hover">
+          <tbody id="friendsList">
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
   </div>
 </body>
 </html>

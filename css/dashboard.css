@@ -3,9 +3,3 @@
     overflow-y: auto;
     min-height: 300px;
 }
-
-.toast {
-    z-index: 2000;
-    right: 0;
-    background: white;
-}

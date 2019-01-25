@@ -1,37 +1,33 @@
 if (!localStorage.getItem("jwtToken"))
   window.location.replace("./login.html");
 
-var currentProfileUsername;
-
 function postTemplate(post) {
   return `
     <div class="card col-sm-11 col-md-11 m-auto">
       <div class="card-body">
         ${
           post.image
-            ? `<img class="img-fluid" src="${"http://localhost:3000" +
-                post.image}" alt="post image" style="width:100%">`
-            : ""
+          ? `<img class="img-fluid" src="${"http://localhost:3000" + post.image}" alt="post image" style="width:100%">`
+          : ""
         }
         <h4 class="card-title">${post.post_by}</h4>
         <p class="card-text">
           ${post.description}
         </p>
         ${
-          post.likes.filter(like => like.liked_by === parseJwt().username)
-            .length > 0
-            ? `<button class="btn btn-primary btn-sm" onclick="toggleLike(${
-                post.id
-              }, this)">
-              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-              <span>${post.likes.length}</span>
-            </button>`
-            : `<button class="btn btn-light btn-sm" onclick="toggleLike(${
-                post.id
-              }, this)">
-              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-              <span>${post.likes.length}</span>
-            </button>`
+          post.likes.filter(like => like.liked_by === parseJwt().username).length > 0
+          ? `<button class="btn btn-primary btn-sm" onclick="toggleLike(${
+              post.id
+            }, this)">
+            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+            <span>${post.likes.length}</span>
+          </button>`
+          : `<button class="btn btn-light btn-sm" onclick="toggleLike(${
+              post.id
+            }, this)">
+            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+            <span>${post.likes.length}</span>
+          </button>`
         }
       </div>
     </div>
@@ -42,15 +38,19 @@ function profileTemplate(profile) {
   let profile_action_btn = "";
   switch(profile.userStatus) {
     case "NOT_A_FRIEND":
-      profile_action_btn = `<a id="profile-action-btn" href="#" class="btn btn-primary" onclick="sendFriendRequest()">SEND FRIEND REQUEST</a>`
+      profile_action_btn = `<a id="profile-action-btn" href="#" class="btn btn-primary" onclick="sendFriendRequest(this, '${profile.username}')">SEND FRIEND REQUEST</a>`
       break;
     case "FRIEND_REQUEST_RECEIVED":
-      profile_action_btn = `<a id="profile-action-btn" href="#" class="btn btn-primary" onclick="acceptFriendRequest()">ACCEPT FRIEND REQUEST</a>`
+      profile_action_btn = `<a id="profile-action-btn" href="#" class="btn btn-primary" onclick="acceptFriendRequest(this, '${profile.username}')">ACCEPT FRIEND REQUEST</a>`
     break;
     case "SELF":
-    case "FRIEND":
-    case "FRIEND_REQUEST_SENT":
       profile_action_btn = "";
+      break;
+    case "FRIEND":
+      profile_action_btn = `<a id="profile-action-btn" href="#" class="btn btn-primary disabled">FRIENDS</a>`;
+      break;
+    case "FRIEND_REQUEST_SENT":
+      profile_action_btn = `<a id="profile-action-btn" href="#" class="btn btn-primary disabled">FRIEND REQUEST SENT</a>`;
   }
   return `
     <div class="card col-sm-11 col-md-11 m-auto">
@@ -96,12 +96,11 @@ function searchUser(event) {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
-    success: result => {
-      currentProfileUsername = username;
+    success: function(result) {
       $("#feed").html("");
       $("#profile").html("");
-      renderProfile(currentProfileUsername);
-      renderPosts(currentProfileUsername);
+      renderProfile(username);
+      renderPosts(username);
     },
     error: function(err) {
       alert(err.responseJSON.message);
@@ -117,7 +116,7 @@ function renderPosts(username) {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
-    success: result => {
+    success: function(result) {
       console.log(result);
       let postsHTML = "";
       result.message.forEach(post => {
@@ -125,7 +124,9 @@ function renderPosts(username) {
       });
       $("#feed").html(postsHTML);
     },
-    error: console.log
+    error: function(error) {
+      console.log;
+    }
   });
 }
 
@@ -137,10 +138,12 @@ function renderProfile(username) {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
-    success: result => {
+    success: function(result) {
       $("#profile").html(profileTemplate(result.profile));
     },
-    error: console.log
+    error: function(error) {
+      console.log(error);
+    }
   });
 }
 
@@ -155,7 +158,7 @@ function toggleLike(post_id, btn) {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
     data: { post_id: post_id },
-    success: result => {
+    success: function(result) {
       console.log("like res", result);
       let likes = Number(button.find("span").text());
       if (result.message === "Post unliked") {
@@ -170,11 +173,14 @@ function toggleLike(post_id, btn) {
         button.attr("disabled", false);
       }
     },
-    error: console.log
+    error: function(error) {
+      console.log(error);
+    }
   });
 }
 
-function sendFriendRequest() {
+function sendFriendRequest(button, to) {
+  button.disabled = true;
   $.ajax({
     method: "POST",
     url: "http://localhost:3000/friendrequests",
@@ -182,19 +188,22 @@ function sendFriendRequest() {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
     data: {
-      to: currentProfileUsername,
+      to: to,
     },
-    success: result => {
+    success: function(result) {
       $("#feed").html("");
       $("#profile").html("");
-      renderProfile(currentProfileUsername);
-      renderPosts(currentProfileUsername);
+      renderProfile(to);
+      renderPosts(to);
     },
-    error: console.log
+    error: function(error) {
+      console.log(error);
+    }
   });
 };
 
-function acceptFriendRequest() {
+function acceptFriendRequest(button, from) {
+  button.disabled = true;
   $.ajax({
     method: "PUT",
     url: "http://localhost:3000/friendrequests",
@@ -202,22 +211,26 @@ function acceptFriendRequest() {
       Authorization: `Bearer ${localStorage.getItem("jwtToken")}`
     },
     data: {
-      from: currentProfileUsername,
+      from: from,
     },
-    success: result => {
+    success: function(result) {
+      // Clean feed and profile divs
       $("#feed").html("");
       $("#profile").html("");
-      renderProfile(currentProfileUsername);
-      renderPosts(currentProfileUsername);
+      // rerender profile and post feeds div
+      renderProfile(from);
+      renderPosts(from);
     },
-    error: console.log
+    error: function(error) {
+      console.log
+    }
   });
 };
 
 $(document).ready(function() {
-  currentProfileUsername = parseJwt().username;
-  renderProfile(currentProfileUsername);
-  renderPosts(currentProfileUsername);
+  let username = parseJwt().username;
+  renderProfile(username);
+  renderPosts(username);
   $("#btn-logout").click(logout);
   $("#form-search-user").submit(searchUser);
 });

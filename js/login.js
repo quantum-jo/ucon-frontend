@@ -1,30 +1,24 @@
-if(localStorage.getItem("jwtToken"))
-  window.location.replace("./dashboard.html");    // replace() removes the current URL from history stack instead of keeping the current URL in history stack, so the user cannot go back to the previous URL
+if (localStorage.getItem("jwtToken"))
+  window.location.replace("./dashboard.html"); // replace() removes the current URL from history stack instead of keeping the current URL in history stack, so the user cannot go back to the previous URL
 
 $(document).ready(function() {
-
   $("#loginForm").submit(function(event) {
     event.preventDefault();
     var username = $("#login-username").val();
     var password = $("#login-password").val();
     var formData = {
       username: username,
-      password: password,
+      password: password
     };
     $.ajax({
       method: "POST",
       url: "http://localhost:3000/login",
       data: formData,
-      success: (result) => {
-        if(result.isValid) {
-          localStorage.setItem("jwtToken", result.jwtToken);
-          window.location.replace("./dashboard.html");
-
-        } else {
-          $("#loginMessage").text(result.message);
-        }
+      success: function(result) {
+        localStorage.setItem("jwtToken", result.jwtToken);
+        window.location.replace("./dashboard.html");
       },
-      error: (error) => {
+      error: function(error) {
         $("#loginMessage").text(error.responseJSON.message);
       }
     });
@@ -37,6 +31,8 @@ $(document).ready(function() {
     let name = $("#register-name").val();
     let bio = $("#register-bio").val();
     let profile_pic = $("#register-profile-pic")[0].files[0];
+    // With XHR2, File upload through AJAX is supported. E.g. through FormData object, but unfortunately it is not supported by all/old browsers.
+    // FormData support starts from following desktop browsers versions. IE 10+, Firefox 4.0+, Chrome 7+, Safari 5+, Opera 12+
     let formData = new FormData();
     formData.append("username", username);
     formData.append("password", password);
@@ -46,15 +42,15 @@ $(document).ready(function() {
     $.ajax({
       method: "POST",
       url: "http://localhost:3000/register",
-      enctype: 'multipart/form-data',
+      enctype: "multipart/form-data",
       data: formData,
       cache: false,
       processData: false,
       contentType: false,
-      success: (result) => {
-        $("#registerMessage").text(result.message);
+      success: function(result) {
+        alert(result.message);
       },
-      error: (error) => {
+      error: function(result) {
         $("#registerMessage").text(error.responseJSON.message);
       }
     });
