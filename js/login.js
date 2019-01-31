@@ -2,24 +2,26 @@ if (localStorage.getItem("jwtToken"))
   window.location.replace("./dashboard.html"); // replace() removes the current URL from history stack instead of keeping the current URL in history stack, so the user cannot go back to the previous URL
 
 $(document).ready(function() {
+
   $("#loginForm").submit(function(event) {
     event.preventDefault();
     var username = $("#login-username").val();
     var password = $("#login-password").val();
-    var formData = {
-      username: username,
-      password: password
-    };
+
     $.ajax({
       method: "POST",
-      url: "https://spider.nitt.edu/workshop/login",
-      data: formData,
+      url: "http://localhost:3000/login",
+      data: {
+        username: username,
+        password: password
+      },
       success: function(result) {
         localStorage.setItem("jwtToken", result.jwtToken);
+        localStorage.setItem("username", username);
         window.location.replace("./dashboard.html");
       },
       error: function(error) {
-        $("#loginMessage").text(error.responseJSON.message);
+        alert(error.responseJSON.message);
       }
     });
   });
@@ -41,7 +43,7 @@ $(document).ready(function() {
     formData.append("profile_pic", profile_pic);
     $.ajax({
       method: "POST",
-      url: "https://spider.nitt.edu/workshop/register",
+      url: "http://localhost:3000/register",
       enctype: 'multipart/form-data',
       data: formData,
       cache: false,
@@ -51,7 +53,7 @@ $(document).ready(function() {
         alert(result.message);
       },
       error: function(result) {
-        $("#registerMessage").text(error.responseJSON.message);
+        alert(error.responseJSON.message);
       }
     });
   });
