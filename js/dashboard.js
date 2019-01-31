@@ -104,6 +104,7 @@ function createPost(event) {
 
 function logout() {
   localStorage.removeItem("jwtToken");
+  localStorage.removeItem("username");
   window.location.replace("./login.html");
 }
 
